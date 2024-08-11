@@ -4,10 +4,7 @@ import time
 import sys
 import tqdm
 
-# ISBNを格納したファイルのパス
-
-
-def get_amazon_price(isbn):
+def get_amazon_title_and_price(isbn):
     url = f"https://www.amazon.co.jp/dp/{isbn}"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
@@ -15,11 +12,21 @@ def get_amazon_price(isbn):
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.content, "html.parser")
     
+    # タイトルを取得
+    title = soup.find("span", {"id": "productTitle"})
+    if title:
+        title_text = title.text.strip()
+    else:
+        title_text = "タイトル情報が見つかりません"
+    
+    # 価格を取得
     price = soup.find("span", {"class": "a-price-whole"})
     if price:
-        return price.text.replace(",", "") + "円"
+        price_text = price.text.replace(",", "") + "円"
     else:
-        return "価格情報が見つかりません"
+        price_text = "価格情報が見つかりません"
+
+    return title_text, price_text
 
 # sys.argv[1]にはISBNリストのファイルパスが入る
 if len(sys.argv) != 2:
@@ -33,8 +40,8 @@ with open(isbn_file_path, 'r') as file:
 # ISBNごとに価格を取得
 total_price = 0
 for isbn in tqdm.tqdm(isbn_list):
-    price = get_amazon_price(isbn)
-    print(f"ISBN: {isbn}, 価格: {price}")
+    title, price = get_amazon_title_and_price(isbn)
+    print(f"ISBN: {isbn}, Title: {title}, 価格: {price}")
     if "円" in price:
         total_price += int(price.replace("円", ""))
     
