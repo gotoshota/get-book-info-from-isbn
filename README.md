@@ -1,4 +1,4 @@
-# get-book-price-from-isbn
+# get-book-info-from-isbn
 ISNBを指定して本の価格を取得する。
 amazonにアクセスして価格を取得しているので、amazonの仕様変更により動作しなくなる可能性があります。
 また、amazonの利用規約に違反する可能性があるので、自己責任でご利用ください。
