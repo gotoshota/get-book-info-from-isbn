@@ -15,7 +15,7 @@ ISNBを指定して本の情報を取得する。
 ### 使い方
 まずは、google book apiのAPIキーを取得する必要がある。
 [Google developers console](https://console.developers.google.com/)にアクセスして、プロジェクトを作成し、APIキーを取得する。
-その後、main.pyのAPI_KEYに取得したAPIキーを設定する。
+その後、`.env`ファイルにAPI_KEYに取得したAPIキーを設定する。
 ```.env
 GOOGLE_BOOKS_API_KEY="your_api_key"
 ```
@@ -42,7 +42,7 @@ amazonにアクセスして価格を取得しているので、amazonの仕様�
 
 ## 使い方
 ```python
-python main.py ISBNs.txt > prices.txt
+python main.py test/ISBNs.txt > test/prices.txt
 ```
 価格が書かれたファイルが出力されます。
 ```txt:prices.txt
