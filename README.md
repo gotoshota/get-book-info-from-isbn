@@ -1,4 +1,4 @@
-# get_book_info_from_isbn
+# get-book-info-from-isbn
 ISBNを指定して本の情報を取得するPythonスクリプト。
 出力はタブ区切りなので、ExcelやGoogleスプレッドシートにimportすることもできる。
 必要ライブラリはrequirements.txtに記載しているので、以下のコマンドでインストールしてください。
