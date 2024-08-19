@@ -1,7 +1,14 @@
 import requests
+from dotenv import load_dotenv
+import os
 import sys
-import time
 import tqdm
+
+# .envファイルから環境変数を読み込む
+load_dotenv()
+
+# 環境変数からAPIキーを取得
+google_books_api_key = os.getenv("GOOGLE_BOOKS_API_KEY")
 
 def get_google_books_info(isbn, api_key):
     url = f"https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}&key={api_key}"
@@ -13,38 +20,33 @@ def get_google_books_info(isbn, api_key):
         title = volume_info.get("title", "タイトル情報が見つかりません")
         authors = ", ".join(volume_info.get("authors", ["著者情報が見つかりません"]))
         
-        # 価格情報の取得
-        price = "価格情報が見つかりません"
-        sale_info = data["items"][0].get("saleInfo", {})
-        if sale_info.get("listPrice"):
-            price = f"{sale_info['listPrice']['amount']} {sale_info['listPrice']['currencyCode']}"
-        
-        return title, authors, price
+        return title, authors
     else:
         return "情報が見つかりません", "", ""
 
-# sys.argv[1]にはISBNリストのファイルパスが入り、sys.argv[2]にはGoogle Books APIキーが入る
-if len(sys.argv) != 2:
-    print("ISBNリストのファイルパスを引数に指定してください")
-    sys.exit(1)
+def main():
+    # コマンドライン引数からファイルパスを取得
+    if len(sys.argv) != 2:
+        print("ISBNリストを含むファイルのパスを引数として渡してください")
+        sys.exit(1)
 
-isbn_file_path = sys.argv[1]
-api_key = "AIzaSyD4iMBw2FnjCQ-yHKsqC6mNzmiQ8M78-dk"
+    isbn_file_path = sys.argv[1]
 
-# ISBNリストをファイルから読み込む
-with open(isbn_file_path, 'r') as file:
-    isbn_list = file.read().splitlines()
+    # ISBNリストをファイルから読み込む
+    try:
+        with open(isbn_file_path, 'r') as file:
+            isbn_list = file.read().splitlines()
+    except FileNotFoundError:
+        print(f"ファイル {isbn_file_path} が見つかりませんでした")
+        sys.exit(1)
 
-# ISBNごとにタイトルと価格を取得
-total_price = 0
-for isbn in tqdm.tqdm(isbn_list):
-    title, authors, price = get_google_books_info(isbn, api_key)
-    print(f"ISBN: {isbn}, Title: {title}, Authors: {authors}, 価格: {price}")
-    if "円" in price:
-        total_price += int(price.replace("円", "").replace(" ", ""))  # 価格の合計を計算
-    
-    # 1リクエストごとに1秒待つ
-    #time.sleep(1)
+    # ISBNごとにタイトルなどを取得
+    print(f"ISBN\tタイトル\t著者")
+    for isbn in tqdm.tqdm(isbn_list):
+        title, authors = get_google_books_info(isbn.strip(), google_books_api_key)
+        # tab 区切りで出力
+        print(f"{isbn}\t{title}\t{authors}")
 
-print(f"総額: {total_price}円")
 
+if __name__ == "__main__":
+    main()
